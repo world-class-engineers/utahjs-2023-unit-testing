@@ -85,7 +85,7 @@ export class MonacoPlugin {
 
         const noscript = document.createElement("script");
         noscript.setAttribute("type", "text/template");
-        noscript.innerHTML = contents;
+        noscript.innerText = contents;
         codeBlock.appendChild(noscript);
       }
     }
@@ -97,10 +97,10 @@ export class MonacoPlugin {
         );
         const initialCode = (
           scriptTemplateChild
-            ? scriptTemplateChild.innerHTML
-            : codeBlock.innerHTML
+            ? scriptTemplateChild.innerText
+            : codeBlock.innerText
         ).trimStart();
-        codeBlock.innerHTML = "";
+        codeBlock.innerText = "";
         const language =
           codeBlock.getAttribute("language") || this.options.defaultLanguage;
         this.activeEditor = this.monaco.editor.create(codeBlock, {
