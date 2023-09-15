@@ -3,7 +3,7 @@
 Slides live at <https://world-class-engineers.github.io/utahjs-2023-unit-testing>
 
 Joe Skeen \
-Conf42: Rustlang 2023
+UtahJS 2023
 
 ## Sizzle
 
