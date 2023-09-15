@@ -1,9 +1,9 @@
 # Fall in LOVE with Unit Testing
 
-Slides live at <https://world-class-engineers.github.io/conf42-rustlang-2023-unit-testing>
+Slides live at <https://world-class-engineers.github.io/utahjs-2023-unit-testing>
 
 Joe Skeen \
-Conf42: Rustlang 2023
+UtahJS 2023
 
 ## Sizzle
 
