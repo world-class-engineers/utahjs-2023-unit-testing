@@ -54,17 +54,26 @@
 	  .monospace {
 		font-family: monospace;
 	  }
+	  .side-by-side {
+		display: flex;
+		flex-direction: row;
+	  }
     </style>
   </head>
   <body>
     <div class="reveal">
       <div class="slides">
-        <section>
+        <section class="r-stack">
           <h1>
             Falling in <span class="emphasis">LOVE</span> with Unit Testing
           </h1>
           <h2 class="subtitle">Joe Skeen</h2>
-		  <p class="subtitle">Slides live at <a href="https://world-class-engineers.github.io/utahjs-2023-unit-testing">https://world-class-engineers.github.io/conf42-rustlang-2023-unit-testing</a></p>
+		  <div class="side-by-side">
+			  <p class="subtitle">
+				Slides live at <a href="https://bit.ly/ujs23-unittesting">https://bit.ly/ujs23-unittesting</a>
+			</p>
+		</div>
+		<img class="r-stretch" src="./assets/qr.svg" />
         </section>
         <section>
           <section>
@@ -391,56 +400,70 @@
             <h2>Enough talk, let's see the code!</h2>
           </section>
           <section>
-            <pre class="r-stretch"><code class="monaco" language="rust">
-pub struct PrivacyDoorKnob {
-	button_is_pushed: bool,
-}
-impl PrivacyDoorKnob {
-	fn new() -> PrivacyDoorKnob { /*TODO*/ }
-	pub fn turn_inside_knob(&mut self, direction: RotationDirection) -> KnobInteractionResult { /*TODO*/ }
-	pub fn turn_outside_knob(&self, direction: RotationDirection) -> KnobInteractionResult { /*TODO*/ }
-	pub fn insert_pin_into_outside_knob_hole(&mut self) { /*TODO*/ }
-	pub fn is_button_pressed(&self) -> bool { /*TODO*/ }
-	pub fn press_button(&mut self) { /*TODO*/ }
+            <pre class="r-stretch"><code class="monaco" language="javascript">
+export class PrivacyDoorknob {
+  private _isButtonPressed = false;
+  get isButtonPressed(): boolean {
+    return this._isButtonPressed;
+  }
+
+  pressButton() {
+    this._isButtonPressed = true;
+  }
+
+  turnOutsideKnob(direction: RotationDirection): IKnobInteractionResult {
+    if (this._isButtonPressed) {
+      return {
+        latchBolt: 'extended',
+      };
+    }
+    return {
+      insideKnob: opposite(direction),
+      outsideKnob: direction,
+      latchBolt: 'retracted',
+    };
+  }
+
+  turnInsideKnob(direction: RotationDirection): IKnobInteractionResult {
+    this._isButtonPressed = false;
+
+    return {
+      insideKnob: direction,
+      outsideKnob: opposite(direction),
+      latchBolt: 'retracted',
+    };
+  }
 }
 
-#[derive(PartialEq, Debug)]
-struct KnobInteractionResult {
-	inside_knob: Option&lt;RotationDirection>,
-	outside_knob: Option&lt;RotationDirection>,
-	latch_bolt: LatchBoltState,
+export type RotationDirection = 'clockwise' | 'counterclockwise';
+
+export interface IKnobInteractionResult {
+  outsideKnob?: RotationDirection;
+  insideKnob?: RotationDirection;
+  latchBolt: 'extended' | 'retracted';
 }
 
-#[derive(PartialEq, Debug)]
-enum RotationDirection {
-	Clockwise,
-	Counterclockwise,
+function opposite(direction: RotationDirection): RotationDirection {
+  switch (direction) {
+    case 'clockwise':
+      return 'counterclockwise';
+    case 'counterclockwise':
+      return 'clockwise';
+    default:
+      throw new Error(`Invalid direction ${direction}`);
+  }
 }
-impl RotationDirection {
-	fn opposite(&self) -> RotationDirection { /*TODO*/ }
-}
-
-#[derive(PartialEq, Debug)]
-enum LatchBoltState {
-	Extended,
-	Retracted,
-}
+              
 			</code></pre>
           </section>
           <section>
-            <pre class="r-stretch"><code class="monaco" language="rust">
-#[cfg(test)]
-mod tests {
-	use super::*;
-}
+            <pre class="r-stretch"><code class="monaco" language="javascript">
+describe('', () => {});
 			</code></pre>
           </section>
           <section>
-            <pre class="r-stretch"><code class="monaco" language="rust">
-#[cfg(test)]
-mod tests {
-	use super::*;
-
+            <pre class="r-stretch"><code class="monaco" language="javascript">
+describe('', () => {
 	// * A privacy doorknob,
 	//     * when the push button is pressed,
 	//         * when the user tries to turn the outside knob clockwise,
@@ -461,587 +484,132 @@ mod tests {
 	//             * should turn the inside knob counterclockwise.
 	//             * should turn the outside knob clockwise.
 	//             * should retract the latch bolt.
-}
+});
 			</code></pre>
           </section>
           <section>
-            <pre class="r-stretch"><code class="monaco" language="rust">
-#[cfg(test)]
-mod tests {
-	use super::*;
-
-	mod when_the_push_button_is_pressed {
-		use super::*;
-
-		mod when_the_user_tries_to_turn_the_outside_knob_clockwise {
-			use super::*;
-
-			#[test]
-			fn should_not_turn_the_outside_knob_at_all() { /* TODO */ }
-
-			#[test]
-			fn should_not_turn_the_inside_knob_at_all() { /* TODO */ }
-
-			#[test]
-			fn should_not_retract_the_latch_bolt() { /* TODO */ }
-		}
-
-		//         * when the user tries to turn the outside knob counterclockwise,
-		//             * should not turn the inside knob at all.
-		//             * should not retract the latch bolt.
-		//         * when the user tries to turn the inside knob clockwise,
-		//             * should pop the push button out.
-		//             * should turn the inside knob clockwise.
-		//             * should turn the outside knob counterclockwise.
-		//             * should retract the latch bolt.
-		//         * when the user tries to turn the inside knob counterclockwise,
-		//             * should pop the push button out.
-		//             * should turn the inside knob counterclockwise.
-		//             * should turn the outside knob clockwise.
-		//             * should retract the latch bolt.
-	}
-}
-			</code></pre>
-          </section>
-          <section>
-            <pre class="r-stretch"><code class="monaco" language="rust">
-#[test]
-fn should_not_turn_the_outside_knob_at_all() {
-	// Arrange
-	let mut knob = PrivacyDoorKnob::new();
-	knob.press_button();
-
-	// Act
-	let result = knob.turn_outside_knob(RotationDirection::Clockwise);
-
-	// Assert
-	assert_eq!(result.outside_knob, None);
-}
-
-#[test]
-fn should_not_turn_the_inside_knob_at_all() {
-	// Arrange
-	let mut knob = PrivacyDoorKnob::new();
-	knob.press_button();
-
-	// Act
-	let result = knob.turn_outside_knob(RotationDirection::Clockwise);
-
-	// Assert
-	assert_eq!(result.inside_knob, None);
-}
-
-#[test]
-fn should_not_retract_the_latch_bolt() {
-	// Arrange
-	let mut knob = PrivacyDoorKnob::new();
-	knob.press_button();
+            <pre class="r-stretch"><code class="monaco" language="javascript">
+describe('A privacy doorknob', () => {
+	describe('when the push button is pressed', () => {
+		describe('when the user tries to turn the outside knob clockwise', () => {
+			it('should not turn the outside knob at all');
+			it('should not turn the inside knob at all');
+			it('should not retract the latch bolt');
+		});
+	});
 	
+	//         * when the user tries to turn the outside knob counterclockwise,
+	//             * should not turn the inside knob at all.
+	//             * should not retract the latch bolt.
+	//         * when the user tries to turn the inside knob clockwise,
+	//             * should pop the push button out.
+	//             * should turn the inside knob clockwise.
+	//             * should turn the outside knob counterclockwise.
+	//             * should retract the latch bolt.
+	//         * when the user tries to turn the inside knob counterclockwise,
+	//             * should pop the push button out.
+	//             * should turn the inside knob counterclockwise.
+	//             * should turn the outside knob clockwise.
+	//             * should retract the latch bolt.
+});
+
+			</code></pre>
+          </section>
+          <section>
+			<div class="side-by-side r-stretch">
+
+				<pre class="r-stretch"><code class="monaco" language="javascript">
+	
+it('should not turn the outside knob at all', () => {
+	// Arrange
+	const knob = new PrivacyDoorKnob();
+	knob.pressButton();
+
 	// Act
-	let result = knob.turn_outside_knob(RotationDirection::Clockwise);
+	const result = knob.turnOutsideKnob('clockwise');
 
 	// Assert
-	assert_eq!(result.latch_bolt, LatchBoltState::Extended);
-}
-			</code></pre>
+	expect(result.outsideKnob).not.toBeDefined();
+});
+it('should not turn the inside knob at all', () => {
+	// Arrange
+	const knob = new PrivacyDoorKnob();
+	knob.pressButton();
+
+	// Act
+	const result = knob.turnOutsideKnob('clockwise');
+
+	// Assert
+	expect(result.insideKnob).not.toBeDefined();
+});
+it('should not retract the latch bolt', () => {
+	// Arrange
+	const knob = new PrivacyDoorKnob();
+	knob.pressButton();
+
+	// Act
+	const result = knob.turnOutsideKnob('clockwise');
+
+	// Assert
+	expect(result.latchBolt).toBe('extended');
+});
+				</code></pre>
+
+				<iframe src="https://jasmine-testing-leap-year-nskqvy.stackblitz.io"></iframe>
+			</div>
           </section>
           <section>
-            <pre class="r-stretch"><code class="monaco" language="plaintext">
-test privacy_door_knob::tests::when_the_push_button_is_pressed::when_the_user_tries_to_turn_the_outside_knob_clockwise::should_not_retract_the_latch_bolt ... ok
-test privacy_door_knob::tests::when_the_push_button_is_pressed::when_the_user_tries_to_turn_the_outside_knob_clockwise::should_not_turn_the_inside_knob_at_all ... ok
-test privacy_door_knob::tests::when_the_push_button_is_pressed::when_the_user_tries_to_turn_the_outside_knob_clockwise::should_not_turn_the_outside_knob_at_all ... ok
-			</code></pre>
-          </section>
-          <section>
-            <pre class="r-stretch"><code class="monaco" language="rust">
-#[cfg(test)]
-mod tests {
-	use super::*;
+			<h2>Time to DRY</h2>
+            <pre class="r-stretch"><code class="monaco" language="javascript">
+describe('A privacy doorknob', () => {
+	describe('when the push button is pressed', () => {
+		describe('when the user tries to turn the outside knob clockwise', () => {
+			it('should not turn the outside knob at all', () => {
+			// Arrange
+			const knob = new PrivacyDoorknob();
+			knob.pressButton();
 
-	mod when_the_push_button_is_pressed {
-		use super::*;
+			// Act
+			const result = knob.turnOutsideKnob('clockwise');
 
-		mod when_the_user_tries_to_turn_the_outside_knob_clockwise {
-			use super::*;
+			// Assert
+			expect(result.outsideKnob).not.toBeDefined();
+			});
+			it('should not turn the inside knob at all', () => {
+			// Arrange
+			const knob = new PrivacyDoorknob();
+			knob.pressButton();
 
-			fn action(knob: &mut PrivacyDoorKnob) -> KnobInteractionResult {
-				knob.turn_outside_knob(RotationDirection::Clockwise)
-			}
+			// Act
+			const result = knob.turnOutsideKnob('clockwise');
 
-			#[test]
-			fn should_not_turn_the_outside_knob_at_all() {
-				// Arrange
-				let mut knob = PrivacyDoorKnob::new();
-				knob.press_button();
+			// Assert
+			expect(result.insideKnob).not.toBeDefined();
+			});
+			it('should not retract the latch bolt', () => {
+			// Arrange
+			const knob = new PrivacyDoorknob();
+			knob.pressButton();
 
-				// Act
-				let result = action(&mut knob);
+			// Act
+			const result = knob.turnOutsideKnob('clockwise');
 
-				// Assert
-				assert_eq!(result.outside_knob, None);
-			}
-
-			#[test]
-			fn should_not_turn_the_inside_knob_at_all() {
-				// Arrange
-				let mut knob = PrivacyDoorKnob::new();
-				knob.press_button();
-
-				// Act
-				let result = action(&mut knob);
-
-				// Assert
-				assert_eq!(result.inside_knob, None);
-			}
-
-			#[test]
-			fn should_not_retract_the_latch_bolt() {
-				// Arrange
-				let mut knob = PrivacyDoorKnob::new();
-				knob.press_button();
+			// Assert
+			expect(result.latchBolt).toBe('extended');
+			});
+		});
+	});
+});
 				
-				// Act
-				let result = action(&mut knob);
-
-				// Assert
-				assert_eq!(result.latch_bolt, LatchBoltState::Extended);
-			}
-		}
-
-		//         * when the user tries to turn the outside knob counterclockwise,
-		//             * should not turn the inside knob at all.
-		//             * should not retract the latch bolt.
-		//         * when the user tries to turn the inside knob clockwise,
-		//             * should pop the push button out.
-		//             * should turn the inside knob clockwise.
-		//             * should turn the outside knob counterclockwise.
-		//             * should retract the latch bolt.
-		//         * when the user tries to turn the inside knob counterclockwise,
-		//             * should pop the push button out.
-		//             * should turn the inside knob counterclockwise.
-		//             * should turn the outside knob clockwise.
-		//             * should retract the latch bolt.
-	}
-}
-
 			</code></pre>
           </section>
-          <section>
-            <pre class="r-stretch"><code class="monaco" language="rust">
-#[cfg(test)]
-mod tests {
-	use super::*;
-
-	mod when_the_push_button_is_pressed {
-		use super::*;
-
-		fn arrange() -> PrivacyDoorKnob {
-			let mut knob = PrivacyDoorKnob::new();
-			knob.press_button();
-			knob
-		}
-
-		mod when_the_user_tries_to_turn_the_outside_knob_clockwise {
-			use super::*;
-
-			fn action(knob: &mut PrivacyDoorKnob) -> KnobInteractionResult {
-				knob.turn_outside_knob(RotationDirection::Clockwise)
-			}
-
-			#[test]
-			fn should_not_turn_the_outside_knob_at_all() {
-				// Arrange
-				let mut knob = arrange();
-
-				// Act
-				let result = action(&mut knob);
-
-				// Assert
-				assert_eq!(result.outside_knob, None);
-			}
-
-			#[test]
-			fn should_not_turn_the_inside_knob_at_all() {
-				// Arrange
-				let mut knob = arrange();
-
-				// Act
-				let result = action(&mut knob);
-
-				// Assert
-				assert_eq!(result.inside_knob, None);
-			}
-
-			#[test]
-			fn should_not_retract_the_latch_bolt() {
-				// Arrange
-				let mut knob = arrange();
-				
-				// Act
-				let result = action(&mut knob);
-
-				// Assert
-				assert_eq!(result.latch_bolt, LatchBoltState::Extended);
-			}
-		}
-
-		//         * when the user tries to turn the outside knob counterclockwise,
-		//             * should not turn the inside knob at all.
-		//             * should not retract the latch bolt.
-		//         * when the user tries to turn the inside knob clockwise,
-		//             * should pop the push button out.
-		//             * should turn the inside knob clockwise.
-		//             * should turn the outside knob counterclockwise.
-		//             * should retract the latch bolt.
-		//         * when the user tries to turn the inside knob counterclockwise,
-		//             * should pop the push button out.
-		//             * should turn the inside knob counterclockwise.
-		//             * should turn the outside knob clockwise.
-		//             * should retract the latch bolt.
-	}
-}
-
-			</code></pre>
-          </section>
-          <section>
-            <pre class="r-stretch"><code class="monaco" language="rust">
-#[cfg(test)]
-mod tests {
-	use super::*;
-
-	mod when_the_push_button_is_pressed {
-		use super::*;
-
-		fn arrange() -> PrivacyDoorKnob {
-			let mut knob = PrivacyDoorKnob::new();
-			knob.press_button();
-			knob
-		}
-
-		mod when_the_user_tries_to_turn_the_outside_knob_clockwise {
-			use super::*;
-
-			fn action(knob: &mut PrivacyDoorKnob) -> KnobInteractionResult {
-				knob.turn_outside_knob(RotationDirection::Clockwise)
-			}
-
-			#[test]
-			fn should_not_turn_the_outside_knob_at_all() {
-				let result = action(&mut arrange());
-				assert_eq!(result.outside_knob, None);
-			}
-
-			#[test]
-			fn should_not_turn_the_inside_knob_at_all() {
-				let result = action(&mut arrange());
-				assert_eq!(result.inside_knob, None);
-			}
-
-			#[test]
-			fn should_not_retract_the_latch_bolt() {
-				let result = action(&mut arrange());
-				assert_eq!(result.latch_bolt, LatchBoltState::Extended);
-			}
-		}
-
-		//         * when the user tries to turn the outside knob counterclockwise,
-		//             * should not turn the inside knob at all.
-		//             * should not retract the latch bolt.
-		//         * when the user tries to turn the inside knob clockwise,
-		//             * should pop the push button out.
-		//             * should turn the inside knob clockwise.
-		//             * should turn the outside knob counterclockwise.
-		//             * should retract the latch bolt.
-		//         * when the user tries to turn the inside knob counterclockwise,
-		//             * should pop the push button out.
-		//             * should turn the inside knob counterclockwise.
-		//             * should turn the outside knob clockwise.
-		//             * should retract the latch bolt.
-	}
-}
-
-			</code></pre>
-          </section>
-          <section>
-            <pre class="r-stretch"><code class="monaco" language="rust">
-#[cfg(test)]
-mod tests {
-	use super::*;
-
-	mod when_the_push_button_is_pressed {
-		use super::*;
-
-		fn arrange() -> PrivacyDoorKnob {
-			let mut knob = PrivacyDoorKnob::new();
-			knob.press_button();
-			knob
-		}
-
-		mod when_the_user_tries_to_turn_the_outside_knob_clockwise {
-			use super::*;
-
-			fn action(knob: &mut PrivacyDoorKnob) -> KnobInteractionResult {
-				knob.turn_outside_knob(RotationDirection::Clockwise)
-			}
-
-			macro_rules! it {
-				($name:ident, $field:ident, $value:expr) => {
-					#[test]
-					fn $name() {
-						let result = action(&mut arrange());
-						assert_eq!(result.$field, $value);
-					}
-				};
-			}
-			
-			it!(should_not_turn_the_outside_knob_at_all, outside_knob, None);
-			it!(should_not_turn_the_inside_knob_at_all, inside_knob, None);
-			it!(should_not_retract_the_latch_bolt, latch_bolt, LatchBoltState::Extended);
-		}
-
-		//         * when the user tries to turn the outside knob counterclockwise,
-		//             * should not turn the inside knob at all.
-		//             * should not retract the latch bolt.
-		//         * when the user tries to turn the inside knob clockwise,
-		//             * should pop the push button out.
-		//             * should turn the inside knob clockwise.
-		//             * should turn the outside knob counterclockwise.
-		//             * should retract the latch bolt.
-		//         * when the user tries to turn the inside knob counterclockwise,
-		//             * should pop the push button out.
-		//             * should turn the inside knob counterclockwise.
-		//             * should turn the outside knob clockwise.
-		//             * should retract the latch bolt.
-	}
-}
-
-			</code></pre>
-          </section>
-          <section>
-            <pre class="r-stretch"><code class="monaco" language="rust">
-#[cfg(test)]
-mod tests {
-	use super::*;
-
-	macro_rules! it {
-		($name:ident, $arrange:ident, $action:ident, $field:ident, $value:expr) => {
-			#[test]
-			fn $name() {
-				let result = $action(&mut $arrange());
-				assert_eq!(result.$field, $value);
-			}
-		};
-	}
-
-	mod when_the_push_button_is_pressed {
-		use super::*;
-
-		fn arrange() -> PrivacyDoorKnob {
-			let mut knob = PrivacyDoorKnob::new();
-			knob.press_button();
-			knob
-		}
-
-		mod when_the_user_tries_to_turn_the_outside_knob_clockwise {
-			use super::*;
-
-			fn action(knob: &mut PrivacyDoorKnob) -> KnobInteractionResult {
-				knob.turn_outside_knob(RotationDirection::Clockwise)
-			}
-			
-			it!(should_not_turn_the_outside_knob_at_all, arrange, action, outside_knob, None);
-			it!(should_not_turn_the_inside_knob_at_all, arrange, action, inside_knob, None);
-			it!(should_not_retract_the_latch_bolt, arrange, action, latch_bolt, LatchBoltState::Extended);
-		}
-
-		//         * when the user tries to turn the outside knob counterclockwise,
-		//             * should not turn the inside knob at all.
-		//             * should not retract the latch bolt.
-		//         * when the user tries to turn the inside knob clockwise,
-		//             * should pop the push button out.
-		//             * should turn the inside knob clockwise.
-		//             * should turn the outside knob counterclockwise.
-		//             * should retract the latch bolt.
-		//         * when the user tries to turn the inside knob counterclockwise,
-		//             * should pop the push button out.
-		//             * should turn the inside knob counterclockwise.
-		//             * should turn the outside knob clockwise.
-		//             * should retract the latch bolt.
-	}
-}
-
-			</code></pre>
-          </section>
-          <section>
-            <pre class="r-stretch"><code class="monaco" language="rust">
-#[cfg(test)]
-mod tests {
-	use super::*;
-
-	macro_rules! it {
-		($name:ident, $arrange:ident, $action:ident, $assertion:expr) => {
-			#[test]
-			fn $name() {
-				let result = $action(&mut $arrange());
-				$assertion(result);
-			}
-		};
-	}
-
-	mod when_the_push_button_is_pressed {
-		use super::*;
-
-		fn arrange() -> PrivacyDoorKnob {
-			let mut knob = PrivacyDoorKnob::new();
-			knob.press_button();
-			knob
-		}
-
-		mod when_the_user_tries_to_turn_the_outside_knob_clockwise {
-			use super::*;
-
-			fn action(knob: &mut PrivacyDoorKnob) -> KnobInteractionResult {
-				knob.turn_outside_knob(RotationDirection::Clockwise)
-			}
-			
-			it!(should_not_turn_the_outside_knob_at_all, arrange, action, 
-				|r: KnobInteractionResult, _| { assert_eq!(r.outside_knob, None); });
-			it!(should_not_turn_the_inside_knob_at_all, arrange, action, 
-				|r: KnobInteractionResult, _| { assert_eq!(r.inside_knob, None); });
-			it!(should_not_retract_the_latch_bolt, arrange, action, 
-				|r: KnobInteractionResult, _| { assert_eq!(r.latch_bolt, LatchBoltState::Extended); });
-		}
-
-		//         * when the user tries to turn the outside knob counterclockwise,
-		//             * should not turn the inside knob at all.
-		//             * should not retract the latch bolt.
-		//         * when the user tries to turn the inside knob clockwise,
-		//             * should pop the push button out.
-		//             * should turn the inside knob clockwise.
-		//             * should turn the outside knob counterclockwise.
-		//             * should retract the latch bolt.
-		//         * when the user tries to turn the inside knob counterclockwise,
-		//             * should pop the push button out.
-		//             * should turn the inside knob counterclockwise.
-		//             * should turn the outside knob clockwise.
-		//             * should retract the latch bolt.
-	}
-}
-
-			</code></pre>
-          </section>
-          <section>
-            <pre class="r-stretch"><code class="monaco" language="rust">
-#[cfg(test)]
-mod tests {
-	use super::*;
-
-	macro_rules! it {
-		($name:ident, $arrange:ident, $action:ident, $assertion:expr) => {
-			#[test]
-			fn $name() {
-				let result = $action(&mut $arrange());
-				$assertion(result);
-			}
-		};
-	}
-
-	mod when_the_push_button_is_pressed {
-		use super::*;
-
-		fn arrange() -> PrivacyDoorKnob {
-			let mut knob = PrivacyDoorKnob::new();
-			knob.press_button();
-			knob
-		}
-
-		mod when_the_user_tries_to_turn_the_outside_knob_clockwise {
-			use super::*;
-
-			fn action(knob: &mut PrivacyDoorKnob) -> KnobInteractionResult {
-				knob.turn_outside_knob(RotationDirection::Clockwise)
-			}
-			
-			it!(should_not_turn_the_outside_knob_at_all, arrange, action, 
-				|r: KnobInteractionResult, _| { assert_eq!(r.outside_knob, None); });
-			it!(should_not_turn_the_inside_knob_at_all, arrange, action, 
-				|r: KnobInteractionResult, _| { assert_eq!(r.inside_knob, None); });
-			it!(should_not_retract_the_latch_bolt, arrange, action, 
-				|r: KnobInteractionResult, _| { assert_eq!(r.latch_bolt, LatchBoltState::Extended); });
-		}
-
-		mod when_the_user_tries_to_turn_the_outside_knob_clockwise {
-			use super::*;
-		
-			fn action(knob: &mut PrivacyDoorKnob) -> KnobInteractionResult {
-				knob.turn_outside_knob(RotationDirection::Clockwise)
-			}
-		
-			it!(should_not_turn_the_outside_knob_at_all, arrange, action, 
-				|r: KnobInteractionResult, _| { assert_eq!(r.outside_knob, None); });
-			it!(should_not_turn_the_inside_knob_at_all, arrange, action, 
-				|r: KnobInteractionResult, _| { assert_eq!(r.inside_knob, None); });
-			it!(should_not_retract_the_latch_bolt, arrange, action, 
-				|r: KnobInteractionResult, _| { assert_eq!(r.latch_bolt, LatchBoltState::Extended); });
-		}
-		
-		mod when_the_user_tries_to_turn_the_outside_knob_counterclockwise {
-			use super::*;
-		
-			fn action(knob: &mut PrivacyDoorKnob) -> KnobInteractionResult {
-				knob.turn_outside_knob(RotationDirection::Counterclockwise)
-			}
-		
-			it!(should_not_turn_the_outside_knob_at_all, arrange, action, 
-				|r: KnobInteractionResult, _| { assert_eq!(r.outside_knob, None); });
-			it!(should_not_turn_the_inside_knob_at_all, arrange, action, 
-				|r: KnobInteractionResult, _| { assert_eq!(r.inside_knob, None); });
-			it!(should_not_retract_the_latch_bolt, arrange, action, 
-				|r: KnobInteractionResult, _| { assert_eq!(r.latch_bolt, LatchBoltState::Extended); });
-		}
-		
-		mod when_the_user_tries_to_turn_the_inside_knob_clockwise {
-			use super::*;
-		
-			fn action(knob: &mut PrivacyDoorKnob) -> KnobInteractionResult {
-				knob.turn_inside_knob(RotationDirection::Clockwise)
-			}
-		
-			it!(should_pop_the_push_button_out, arrange, action, 
-				|_, knob: &PrivacyDoorKnob| { assert_eq!(knob.is_button_pressed(), false); });
-			it!(should_turn_the_inside_knob_clockwise, arrange, action, 
-				|r: KnobInteractionResult, _| { assert_eq!(r.inside_knob, Some(RotationDirection::Clockwise)); });
-			it!(should_turn_the_outside_knob_counterclockwise, arrange, action, 
-				|r: KnobInteractionResult, _| { assert_eq!(r.outside_knob, Some(RotationDirection::Counterclockwise)); });
-			it!(should_retract_the_latch_bolt, arrange, action,
-				|r: KnobInteractionResult, _| { assert_eq!(r.latch_bolt, LatchBoltState::Retracted); });
-		}
-		
-		mod when_the_user_tries_to_turn_the_inside_knob_counterclockwise {
-			use super::*;
-		
-			fn action(knob: &mut PrivacyDoorKnob) -> KnobInteractionResult {
-				knob.turn_inside_knob(RotationDirection::Counterclockwise)
-			}
-		
-			it!(should_pop_the_push_button_out, arrange, action,
-				|_, knob: &PrivacyDoorKnob| { assert_eq!(knob.is_button_pressed(), false); });
-			it!(should_turn_the_inside_knob_counterclockwise, arrange, action,
-				|r: KnobInteractionResult, _| { assert_eq!(r.inside_knob, Some(RotationDirection::Counterclockwise)); });
-			it!(should_turn_the_outside_knob_clockwise, arrange, action,
-				|r: KnobInteractionResult, _| { assert_eq!(r.outside_knob, Some(RotationDirection::Clockwise)); });
-			it!(should_retract_the_latch_bolt, arrange, action,
-				|r: KnobInteractionResult, _| { assert_eq!(r.latch_bolt, LatchBoltState::Retracted); });
-		}
-	}
-}
-
-			</code></pre>
-          </section>
+		  <section>
+        <iframe class="r-stretch" src="https://stackblitz.com/edit/jasmine-testing-leap-year-nazorn?file=src%2Fprivacy-doorknob.ts"></iframe>
+		  </section>
         </section>
         <section>
           <h2>Don't get carried away</h2>
-		  <p class="monospace">fn remove_vowels(input: String) -> String {/* TODO */}</p>
+		  <p class="monospace">function removeVowels(input: string): string {/* TODO */}</p>
 		  <p>
 			Test:
 			<ul>
@@ -1068,6 +636,7 @@ mod tests {
 				<a href="mailto:joe@worldclassengineers.dev">joe@worldclassengineers.dev</a>
 			</p>
 			<h2>Thanks for watching!</h2>
+      <img class="r-stretch" src="./assets/joe-qr.svg" />
 		</section>
       </div>
     </div>
