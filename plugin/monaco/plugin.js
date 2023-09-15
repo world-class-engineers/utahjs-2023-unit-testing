@@ -106,6 +106,7 @@ export class MonacoPlugin {
         this.activeEditor = this.monaco.editor.create(codeBlock, {
           value: initialCode,
           language: language,
+          fontSize: 20
         });
       }
     }
